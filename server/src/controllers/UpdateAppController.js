@@ -3,7 +3,7 @@ import { App } from "../models/index.js";
 const UpdateAppController = async (req, res) => {
     const { authUserId, targetApp } = req;
     const { appId } = req.params;
-    const { info } = req.body;
+    const { description } = req.body;
 
     try {
         // const match = await App.findOne({
@@ -26,7 +26,7 @@ const UpdateAppController = async (req, res) => {
 
         const result = await App.update(
             {
-                info,
+                description,
             },
             {
                 where: {

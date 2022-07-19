@@ -6,9 +6,9 @@ const AppModel = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        info: {
-            type: DataTypes.JSON,
-            allowNull: false,
+        description: {
+            type: DataTypes.TEXT,
+            allowNull: true,
         },
     });
 };

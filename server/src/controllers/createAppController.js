@@ -2,12 +2,12 @@ import { App } from "../models/index.js";
 
 const CreateAppController = async (req, res) => {
     const { authUserId } = req;
-    const { appname, info } = req.body;
+    const { appname, description } = req.body;
 
     try {
         const newApp = await App.create({
             appname,
-            info,
+            description,
             ownerId: authUserId,
         });
 
