@@ -1,75 +1,205 @@
 import { useContext, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
+import {
+  Box,
+  Button,
+  Divider,
+  Grid,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import { Container } from "@mui/system";
-import { Navigate } from "react-router-dom";
-import { Button, Grid, Typography } from "@mui/material";
-import BackIcon from "@mui/icons-material/ArrowBack";
-import UserContext from "../UserContext";
-import { allApps } from "../services/api";
-import AppsTable from "./AppsTable";
-import AppInfo from "./AppInfo";
 
-export default function AppsPage() {
+import { Add as AddIcon, ArrowBack as BackIcon } from "@mui/icons-material";
+import { allApps, createApp, updateApp } from "../services/api";
+import UserContext from "../UserContext";
+import AppsTable from "./AppsTable";
+import CreateAppView from "./CreateAppView";
+import EditAppView from "./EditAppView";
+
+export default function AppsPage({ setGlobalSuccess, setGlobalError }) {
   const [authedUser, handleAuthChange] = useContext(UserContext);
   const [apps, setApps] = useState([]);
   const [selectedApp, setSelectedApp] = useState(null);
-
-  const isSignedIn = authedUser && authedUser.accessToken;
+  const [isCreateMode, setIsCreateMode] = useState(false);
 
   useEffect(() => {
-    if (isSignedIn) {
-      fetchApps();
-    }
-  }, []);
+    fetchApps();
+  }, [authedUser]);
 
   async function fetchApps() {
     try {
-      const result = await allApps(authedUser.accessToken);
+      const result = await allApps(authedUser ? authedUser.accessToken : null);
       setApps(result);
     } catch (error) {
+      if (error.message === "401" || error.message === "403") {
+        handleAuthChange(null);
+      }
       console.error(error);
     }
   }
 
-  console.log(apps);
-  return (
-    <Container>
-      {!isSignedIn && (
-        <Navigate to={"/login"} state={{ foo: "foo" }} replace={true} />
-      )}
-      {!selectedApp && (
-        <Grid container spacing={8} sx={{ paddingTop: "5rem" }}>
-          <Grid item xs={12}>
+  function handleAppSelected(app) {
+    setSelectedApp(app);
+  }
+
+  async function handleAppCreate(newAppInfo) {
+    try {
+      const result = await createApp(newAppInfo, authedUser.accessToken);
+      if (result !== null) {
+        setApps([result].concat(apps));
+        setIsCreateMode(false);
+        setGlobalSuccess(
+          `${newAppInfo.appname} has been successfully created!`
+        );
+      } else {
+        throw new Error(
+          "Created app information was missing in server response."
+        );
+      }
+    } catch (error) {
+      setGlobalError(error.message);
+    }
+  }
+
+  async function handleAppUpdate(updatedAppInfo) {
+    try {
+      const result = await updateApp(
+        updatedAppInfo.id,
+        {
+          appname: updatedAppInfo.appname,
+          description: updatedAppInfo.description,
+        },
+        authedUser.accessToken
+      );
+
+      // Update the local copy of the app
+      if (result.updatedApp != null) {
+        setApps(
+          [result.updatedApp].concat(
+            apps.filter((app) => app.id !== result.updatedApp.id)
+          )
+        );
+        setSelectedApp(null);
+        setGlobalSuccess(
+          `${updatedAppInfo.appname} has been successfully updated!`
+        );
+      } else {
+        throw new Error(
+          "Updated app information was missing in server response."
+        );
+      }
+    } catch (error) {
+      if (error.message === "404") {
+        setGlobalError(`App with ID ${updatedAppInfo.id} does not exist.`);
+      } else {
+        setGlobalError(error.message);
+      }
+    }
+  }
+
+  function renderAppsView() {
+    return (
+      <Grid container spacing={8} sx={{ paddingTop: "5rem" }}>
+        <Grid item xs={12}>
+          <Box sx={{ display: "flex", flexDirection: "row" }}>
             <Typography variant="h4" component="div">
               Apps
             </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <AppsTable apps={apps} onAppSelected={setSelectedApp} />
-          </Grid>
-        </Grid>
-      )}
-      {selectedApp && (
-        <Grid container spacing={8} sx={{ paddingTop: "5rem" }}>
-          <Grid item xs={12}>
-            <Typography variant="h4" component="div">
-              Edit app {selectedApp.appname}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
+            <Box sx={{ flexGrow: 1 }}></Box>
             <Button
               variant="contained"
-              endIcon={<BackIcon />}
-              onClick={() => setSelectedApp(null)}
+              startIcon={<AddIcon />}
+              onClick={() => {
+                setIsCreateMode(true);
+              }}
             >
-              Back to apps table
+              New App
             </Button>
-          </Grid>
-          <Grid item xs={12}>
-            <AppInfo app={selectedApp} />
-          </Grid>
+          </Box>
         </Grid>
-      )}
-    </Container>
-  );
+        <Grid item xs={12}>
+          <AppsTable apps={apps} onAppSelected={handleAppSelected} />
+        </Grid>
+      </Grid>
+    );
+  }
+
+  function renderCreateAppView() {
+    return (
+      <Box sx={{ width: "100%" }}>
+        <Box sx={{ my: 3, mx: 2 }}>
+          <Grid container alignItems={"center"} columnSpacing={1}>
+            <Grid item>
+              <IconButton
+                aria-label="back"
+                onClick={() => setIsCreateMode(false)}
+              >
+                <BackIcon />
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <Typography variant="h5" component="div">
+                Create a new app
+              </Typography>
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Divider />
+        <CreateAppView
+          onCreate={handleAppCreate}
+          onCancel={() => setIsCreateMode(false)}
+        />
+      </Box>
+    );
+  }
+
+  function renderEditAppView() {
+    return (
+      <Box sx={{ width: "100%" }}>
+        <Box sx={{ my: 3, mx: 2 }}>
+          <Grid container alignItems={"center"} columnSpacing={1}>
+            <Grid item>
+              <IconButton
+                aria-label="back"
+                onClick={() => setSelectedApp(null)}
+              >
+                <BackIcon />
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <Typography variant="h5" component="div">
+                {selectedApp.appname}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Divider />
+        <EditAppView
+          app={selectedApp}
+          onUpdate={handleAppUpdate}
+          onCancel={() => setSelectedApp(null)}
+        />
+      </Box>
+    );
+  }
+
+  let contents = null;
+  if (isCreateMode === true) {
+    contents = renderCreateAppView();
+  } else if (selectedApp !== null) {
+    contents = renderEditAppView();
+  } else {
+    contents = renderAppsView();
+  }
+
+  return <Container>{contents}</Container>;
 }
+
+AppsPage.propTypes = {
+  setGlobalSuccess: PropTypes.func,
+  setGlobalError: PropTypes.func,
+};

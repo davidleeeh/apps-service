@@ -1,6 +1,6 @@
 const AUTH_STORAGE_KEY = "app-services-access-token";
 
-function saveAuthedUser(username, accessToken) {
+function saveUser(username, accessToken) {
   localStorage.setItem(
     AUTH_STORAGE_KEY,
     JSON.stringify({
@@ -10,12 +10,12 @@ function saveAuthedUser(username, accessToken) {
   );
 }
 
-function deleteAuthedUser() {
+function deleteSavedUser() {
   localStorage.removeItem(AUTH_STORAGE_KEY);
 }
 
-function getAuthedUser() {
+function getSavedUser() {
   return JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY));
 }
 
-export { saveAuthedUser, getAuthedUser, deleteAuthedUser };
+export { saveUser, getSavedUser, deleteSavedUser };

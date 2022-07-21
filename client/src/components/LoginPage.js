@@ -1,23 +1,26 @@
+import PropTypes from "prop-types";
+
 import { Box, Button, Grid, Stack, TextField, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import React, { useContext, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { signinUser } from "../services/api";
 import UserContext from "../UserContext";
 
-export default function LoginPage() {
+export default function LoginPage({ setGlobalError }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [authedUser, handleAuthChange] = useContext(UserContext);
-
-  const navigate = useNavigate();
+  const [usernameError, setUsernameError] = useState(null);
+  const [passwordError, setPasswordError] = useState(null);
 
   function handleUsernameChange(event) {
     setUsername(event.target.value);
+    usernameError !== null && setUsernameError(null);
   }
 
   function handlePasswordChange(event) {
     setPassword(event.target.value);
+    passwordError !== null && setPasswordError(null);
   }
 
   async function handleSignin() {
@@ -28,15 +31,22 @@ export default function LoginPage() {
       });
 
       if (result.username && result.accessToken) {
-        handleAuthChange(result);
-
-        navigate("/");
+        handleAuthChange(result, "/");
+        setGlobalError(null);
       } else {
         throw new Error("Missing access token from registration result");
       }
     } catch (err) {
-      console.error(err);
+      if (err.message === "404") {
+        setUsernameError(`User does not exist.`);
+      } else if (err.message === "401") {
+        setPasswordError(`Invalid password.`);
+      } else {
+        setGlobalError(err.message);
+      }
     }
+
+    setPassword("");
   }
 
   function renderSigninForm() {
@@ -63,6 +73,8 @@ export default function LoginPage() {
                 label="Username"
                 variant="standard"
                 value={username}
+                error={usernameError !== null}
+                helperText={usernameError !== null ? usernameError : null}
                 onChange={handleUsernameChange}
               />
               <TextField
@@ -72,6 +84,8 @@ export default function LoginPage() {
                 label="Password"
                 variant="standard"
                 value={password}
+                error={passwordError !== null}
+                helperText={passwordError !== null ? passwordError : null}
                 onChange={handlePasswordChange}
               />
 
@@ -105,9 +119,13 @@ export default function LoginPage() {
   const isSignedIn = authedUser && authedUser.accessToken;
 
   return (
-    <Container>
+    <Container sx={{ textAlign: "center" }}>
       {!isSignedIn && renderSigninForm()}
       {isSignedIn && renderSignedInMessage()}
     </Container>
   );
 }
+
+LoginPage.propTypes = {
+  setGlobalError: PropTypes.func,
+};

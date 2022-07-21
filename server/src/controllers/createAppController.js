@@ -11,11 +11,7 @@ const CreateAppController = async (req, res) => {
             ownerId: authUserId,
         });
 
-        res.status(200).send({
-            appname: newApp.appname,
-            id: newApp.id,
-            createdAt: newApp.createdAt,
-        });
+        res.status(200).send(newApp);
     } catch (error) {
         res.status(500).send({ error: `${error.message}` });
     }

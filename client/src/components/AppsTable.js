@@ -1,5 +1,3 @@
-import * as React from "react";
-import { styled } from "@mui/material/styles";
 import {
   Paper,
   Table,
@@ -9,6 +7,9 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material/";
+import { styled } from "@mui/material/styles";
+import * as React from "react";
+import PropTypes from "prop-types";
 
 import { tableCellClasses } from "@mui/material/TableCell";
 
@@ -22,10 +23,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
+const StyledTableRow = styled(TableRow)(() => ({
   // hide last border
   "&:last-child td, &:last-child th": {
     border: 0,
@@ -41,23 +39,30 @@ export default function AppsTable({ apps, onAppSelected }) {
             <StyledTableCell>Name</StyledTableCell>
             <StyledTableCell align="center">App ID</StyledTableCell>
             <StyledTableCell align="center">Owner ID</StyledTableCell>
-            {/* <StyledTableCell align="center">Created At</StyledTableCell>
-            <StyledTableCell align="right">Updated At</StyledTableCell> */}
+            <StyledTableCell align="center">Created At</StyledTableCell>
+            <StyledTableCell align="center">Updated At</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {apps.map((app) => {
             const { appname, id, ownerId, createdAt, updatedAt } = app;
 
+            const createdDate = new Date(createdAt),
+              updatedDate = new Date(updatedAt);
+
             return (
-              <StyledTableRow key={id} onClick={() => onAppSelected(app)}>
+              <StyledTableRow key={id} hover onClick={() => onAppSelected(app)}>
                 <StyledTableCell component="th" scope="row">
                   {appname}
                 </StyledTableCell>
                 <StyledTableCell align="center">{id}</StyledTableCell>
                 <StyledTableCell align="center">{ownerId}</StyledTableCell>
-                {/* <StyledTableCell align="right">{createdAt}</StyledTableCell>
-              <StyledTableCell align="right">{updatedAt}</StyledTableCell> */}
+                <StyledTableCell align="center">
+                  {createdDate.toLocaleString()}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {updatedDate.toLocaleString()}
+                </StyledTableCell>
               </StyledTableRow>
             );
           })}
@@ -66,3 +71,8 @@ export default function AppsTable({ apps, onAppSelected }) {
     </TableContainer>
   );
 }
+
+AppsTable.propTypes = {
+  apps: PropTypes.array,
+  onAppSelected: PropTypes.func,
+};

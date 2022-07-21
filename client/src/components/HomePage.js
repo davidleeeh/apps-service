@@ -1,21 +1,21 @@
 import { useContext } from "react";
 
-import { Container } from "@mui/system";
 import { Grid, Typography } from "@mui/material";
+import { Container } from "@mui/system";
 import { Link } from "react-router-dom";
 import UserContext from "../UserContext";
 
 export default function HomePage() {
-  const [authedUser, handleAuthChange] = useContext(UserContext);
+  const [authedUser] = useContext(UserContext);
 
   const isSignedIn = authedUser && authedUser.accessToken;
 
   return (
-    <Container>
+    <Container sx={{ textAlign: "center" }}>
       <Grid container spacing={8} sx={{ paddingTop: "5rem" }}>
         <Grid item xs={12}>
           <Typography variant="h4" component="div">
-            Welcome to Apps Service
+            Welcome {isSignedIn ? authedUser.username : ""}
           </Typography>
         </Grid>
         {!isSignedIn && (
@@ -27,12 +27,6 @@ export default function HomePage() {
             <Typography variant="body1" component="p">
               Or, <Link to={"/signup"}>sign up </Link> for a new account.
             </Typography>
-          </Grid>
-        )}
-
-        {isSignedIn && (
-          <Grid item xs={12}>
-            Hello {authedUser.username}!
           </Grid>
         )}
       </Grid>

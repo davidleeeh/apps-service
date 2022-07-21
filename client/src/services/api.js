@@ -20,6 +20,14 @@ async function fetchApp(appId, accessToken) {
   return await getData(`${API_ROOT}/apps/${appId}`, accessToken);
 }
 
+async function createApp(data, accessToken) {
+  return await postData(`${API_ROOT}/apps`, data, accessToken);
+}
+
+async function updateApp(appId, data, accessToken) {
+  return await putData(`${API_ROOT}/apps/${appId}`, data, accessToken);
+}
+
 async function getData(url, accessToken = null) {
   const response = await fetch(url, {
     method: "GET",
@@ -61,7 +69,7 @@ async function postData(url, data, accessToken = null) {
   return response.json();
 }
 
-async function PutData(url, data, accessToken = null) {
+async function putData(url, data, accessToken = null) {
   const response = await fetch(url, {
     method: "PUT",
     mode: "cors",
@@ -82,4 +90,12 @@ async function PutData(url, data, accessToken = null) {
   return response.json();
 }
 
-export { registerUser, signinUser, checkAuth, allApps, fetchApp };
+export {
+  registerUser,
+  signinUser,
+  checkAuth,
+  allApps,
+  fetchApp,
+  createApp,
+  updateApp,
+};
