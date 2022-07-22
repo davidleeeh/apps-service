@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { useContext, useEffect, useState } from "react";
 
 import {
   Box,
@@ -36,7 +36,7 @@ export default function AppsPage({ setGlobalSuccess, setGlobalError }) {
       if (error.message === "401" || error.message === "403") {
         handleAuthChange(null);
       }
-      console.error(error);
+      setGlobalError(error.message);
     }
   }
 
