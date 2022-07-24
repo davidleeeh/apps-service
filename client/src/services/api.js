@@ -8,10 +8,6 @@ async function signinUser(data) {
   return await postData(`${API_ROOT}/auth/signin`, data);
 }
 
-async function checkAuth(accessToken) {
-  return await getData(`${API_ROOT}/auth`, accessToken);
-}
-
 async function allApps(accessToken) {
   return await getData(`${API_ROOT}/apps`, accessToken);
 }
@@ -90,12 +86,4 @@ async function putData(url, data, accessToken = null) {
   return response.json();
 }
 
-export {
-  registerUser,
-  signinUser,
-  checkAuth,
-  allApps,
-  fetchApp,
-  createApp,
-  updateApp,
-};
+export { registerUser, signinUser, allApps, fetchApp, createApp, updateApp };
