@@ -1,15 +1,20 @@
 import { App } from "../models/index.js";
 
 const UpdateAppController = async (req, res) => {
-    const { authUserId, targetApp } = req;
     const { appId } = req.params;
     const { appname, description } = req.body;
+
+    if (appname !== undefined && (appname === null || appname === "")) {
+        return res.status(400).send({
+            error: "Appname cannot be null or empty string.",
+        });
+    }
 
     try {
         const status = await App.update(
             {
                 appname,
-                description,
+                description: description || "",
             },
             {
                 where: {

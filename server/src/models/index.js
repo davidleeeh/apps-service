@@ -1,18 +1,18 @@
 import Sequelize from "sequelize";
-import UserModel from "./user.model.js";
 import AppModel from "./app.model.js";
-
+import UserModel from "./user.model.js";
 import "dotenv/config";
+import dbConfig from "../config/db.config.js";
 
 const sequelize = new Sequelize(
-    process.env.DB_SCHEMA || "appdb",
-    process.env.DB_USER || "appuser",
-    process.env.DB_PASSWORD || "appuser",
+    process.env.DB_SCHEMA || dbConfig.schema,
+    process.env.DB_USER || dbConfig.user,
+    process.env.DB_PASSWORD || dbConfig.password,
     {
-        host: process.env.DB_HOST || "localhost",
-        port: process.env.DB_PORT || 5432,
+        host: process.env.DB_HOST || dbConfig.host,
+        port: process.env.DB_PORT || dbConfig.port,
         dialect: "postgres",
-        operatorsAliases: false,
+        logging: true,
     }
 );
 

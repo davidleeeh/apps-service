@@ -3,7 +3,13 @@ import bcrypt from "bcryptjs";
 import { generateAccessToken } from "../utils/index.js";
 
 const SignUpController = async (req, res) => {
-    const { username, password, email } = req.body;
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).send({
+            message: "Both username and password are required.",
+        });
+    }
 
     try {
         const match = await User.findOne({
@@ -14,14 +20,13 @@ const SignUpController = async (req, res) => {
 
         if (match) {
             return res.status(400).send({
-                message: `Username ${username} already exists.`,
+                error: `Username ${username} already exists.`,
             });
         }
 
         const newUser = await User.create({
             username,
             password: bcrypt.hashSync(password),
-            email,
         });
 
         const token = generateAccessToken(newUser.id, newUser.username);
@@ -29,7 +34,7 @@ const SignUpController = async (req, res) => {
         res.status(200).send({
             id: newUser.id,
             username: newUser.username,
-            email: newUser.email,
+
             createAt: newUser.createAt,
             accessToken: token,
         });
