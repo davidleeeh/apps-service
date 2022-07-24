@@ -100,6 +100,14 @@ export default function AppsPage({ setGlobalSuccess, setGlobalError }) {
   }
 
   function renderAppsView() {
+    const appsContents =
+      apps.length > 0 ? (
+        <AppsTable apps={apps} onAppSelected={handleAppSelected} />
+      ) : (
+        <Typography variant="h5">
+          There is no app yet. Go ahead and create one.
+        </Typography>
+      );
     return (
       <Grid container spacing={8} sx={{ paddingTop: "5rem" }}>
         <Grid item xs={12}>
@@ -120,7 +128,7 @@ export default function AppsPage({ setGlobalSuccess, setGlobalError }) {
           </Box>
         </Grid>
         <Grid item xs={12}>
-          <AppsTable apps={apps} onAppSelected={handleAppSelected} />
+          {appsContents}
         </Grid>
       </Grid>
     );
