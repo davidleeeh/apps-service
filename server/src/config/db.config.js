@@ -1,5 +1,5 @@
 const config = {
-    host: "appdb",
+    host: "localhost",
     port: 5432,
     schema: "appdb",
     user: "appuser",
