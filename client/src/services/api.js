@@ -1,4 +1,6 @@
-const API_ROOT = "http://localhost:8080";
+import apiConfigs from "../config/api.config.js";
+
+const API_ROOT = apiConfigs.url;
 
 async function registerUser(data) {
   return await postData(`${API_ROOT}/auth/signup`, data);
