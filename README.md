@@ -72,7 +72,7 @@ Now the server is up and running!
 
 To run the client, under `/client` directory, run `npm run start`. It will automatically open up a new browser window and load the landing page.
 
-[landing page](/assets/landing-page.png)
+![landing page](/assets/landing-page.png)
 
 ### Unit tests
 Tests for API is implemented with Mocha, Supertest and Chai. To run the tests, under `/server/`, run `npm run test`.
